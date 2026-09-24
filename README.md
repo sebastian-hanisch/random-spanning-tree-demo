@@ -1,5 +1,7 @@
 # Zufällige Spannbäume – zählen und würfeln statt optimieren – Streamlit-Demo
 
+**[→ Demo live ausprobieren](https://sebastianhanisch-random-spanning-tree-demo.streamlit.app/)**
+
 Elftes und **letztes** Stück der **Spannbaum-Reihe** der "Konzepte"-Reihe für die Website "Sebastian Hanisch – Operations Research und Machine Learning". Bisher wurde optimiert: der *billigste* Baum. Ein Netz hat aber unvorstellbar viele Spannbäume, und ihre Gesamtheit hat Struktur. Die Demo stellt vier Fragen, alle gemessen: **(1) Zählen** – wie viele Spannbäume gibt es (Matrix-Baum-Satz, Kirchhoff 1847), und mit welcher Wahrscheinlichkeit liegt eine Kante in einem zufälligen Baum? **(2) Würfeln** – wie zieht man einen Baum gleichverteilt (Wilson, Aldous-Broder), und warum funktioniert "Kruskal mit Zufallsordnung" *nicht*? **(3) Vom Zufall zum MST** – wie teuer ist ein Zufallsbaum, und wie weit muss man die "Temperatur" absenken, bis der billigste Baum herauskommt? **(4) Zuverlässigkeit** – fällt jede Kante mit Wahrscheinlichkeit p aus, bleibt das Netz genau dann verbunden, wenn *ein* Spannbaum überlebt.
 
 **Einordnung in die Reihe:** geplant waren elf Stücke, alle sind gebaut – die Reihe ist damit vollständig:
