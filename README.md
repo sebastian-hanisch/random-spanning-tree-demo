@@ -106,4 +106,4 @@ Tests: `pip install -r requirements-dev.txt` und `python -m pytest tests/ -W err
 - Karger, D. R. (2001). *A randomized fully polynomial time approximation scheme for the all-terminal network reliability problem.* SIAM Review 43(3), 499–522 (nur genannt, nicht gebaut).
 - Kruskal (1956) und Union-Find (Tarjan 1975) wie in der kruskal-demo.
 
-Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning.
+Diese Demo ist Teil des Portfolios von [Sebastian Hanisch](https://sebastianhanisch.net) – Operations Research und Machine Learning ([Über mich](https://sebastianhanisch.net/ueber-mich.html)). Mehr zur Reihe: [Spannbäume: vom Kruskal bis zum Zufallsbaum](https://sebastianhanisch.net/konzepte-spannbaum.html).
