@@ -76,22 +76,69 @@ def laplacian(n, edges, weights):
     return lap
 
 
+def _reduced_system(n, edges, weights, ground):
+    """Das Netz ohne den Knoten `ground` als (off, slack): off[i, j] = Leitwert zwischen den verbleibenden Knoten (Reihenfolge der Knotennummern), slack[i] = Leitwert zum entfernten Knoten."""
+    keep = [v for v in range(n) if v != ground]
+    pos = {v: i for i, v in enumerate(keep)}
+    off = np.zeros((n - 1, n - 1))
+    slack = np.zeros(n - 1)
+    for (u, v, *_), w in zip(edges, weights):
+        if u == ground:
+            slack[pos[v]] += w
+        elif v == ground:
+            slack[pos[u]] += w
+        else:
+            off[pos[u], pos[v]] += w
+            off[pos[v], pos[u]] += w
+    return off, slack
+
+
+def _gth_eliminate(off, slack):
+    """Knoten für Knoten eliminieren (Stern-Netz-Umformung, GTH): der Leitwert zwischen zwei Nachbarn wächst um w_ij w_ik / d_i mit d_i = Summe der Leitwerte am Knoten - nur Summen und Produkte positiver
+    Zahlen, keine Differenz. Der Laplace-Minor hat so eine Determinante und eine Inverse mit kleinem RELATIVEM Fehler auch bei Gewichten über 100 Zehnerpotenzen (`slogdet`/`pinv` verlieren dort jede Stelle,
+    `pinv` schon bei einem Netz mit 40 Knoten ohne Gewichte: seine Rangschwelle trennt die Null der Laplace-Matrix nicht sicher von den kleinen Eigenwerten). Gibt (d, Linv) oder None, wenn das Netz nicht zusammenhängt."""
+    n_, off, slack = len(slack), off.copy(), slack.copy()
+    d = np.empty(n_)
+    mult = np.zeros((n_, n_))                       # mult[j, i] = w_ji / d_i (j nach i eliminiert)
+    for i in range(n_):
+        d[i] = off[i, i + 1:].sum() + slack[i]
+        if not d[i] > 0.0:
+            return None
+        if i + 1 < n_:
+            c = off[i + 1:, i].copy()
+            mult[i + 1:, i] = c / d[i]
+            block = off[i + 1:, i + 1:]
+            block += np.outer(c, c) / d[i]
+            np.fill_diagonal(block, 0.0)
+            slack[i + 1:] += c * slack[i] / d[i]
+    linv = np.eye(n_)                               # (I - mult)^-1 = Summe mult^k: nur positive Einträge
+    for i in range(1, n_):
+        linv[i, :i] = mult[i, :i] @ linv[:i, :i]
+    return d, linv
+
+
 def log_partition(n, edges, weights):
-    """ln der Summe über alle Spannbäume von Produkt(Kantengewichte) (Determinante des gewichteten Minors); -inf, wenn es keinen Spannbaum gibt."""
+    """ln der Summe über alle Spannbäume von Produkt(Kantengewichte) (Determinante des gewichteten Minors, als Summe von ln d_i der Elimination); -inf, wenn es keinen Spannbaum gibt."""
     if n <= 1:
         return 0.0
-    sign, logdet = np.linalg.slogdet(laplacian(n, edges, weights)[:-1, :-1])
-    return float(logdet) if sign > 0 else -math.inf
+    out = _gth_eliminate(*_reduced_system(n, edges, weights, n - 1))
+    return -math.inf if out is None else float(np.log(out[0]).sum())
 
 
 def inclusion_probabilities(n, edges, weights=None):
-    """Wahrscheinlichkeit je Kante, in einem (nach Gewichtsprodukt) zufälligen Spannbaum zu liegen: w_e * R_eff(e), R_eff über die Pseudoinverse der Laplace-Matrix."""
+    """Wahrscheinlichkeit je Kante, in einem (nach Gewichtsprodukt) zufälligen Spannbaum zu liegen: w_e * R_eff(e). R_eff(u, v) ist der Eintrag v der Diagonale der Inversen des Laplace-Minors ohne u
+    (ein Minor je Knoten u, der eine Kante (u, v) mit u < v hat): so entsteht R_eff ohne Differenz großer Zahlen."""
     weights = [1.0] * len(edges) if weights is None else weights
-    pinv = np.linalg.pinv(laplacian(n, edges, weights))
-    out = []
-    for (u, v, *_), w in zip(edges, weights):
-        out.append(float(w * (pinv[u, u] + pinv[v, v] - 2.0 * pinv[u, v])))
-    return out
+    reff = {}
+    for u in sorted({min(e[0], e[1]) for e in edges}):
+        out = _gth_eliminate(*_reduced_system(n, edges, weights, u))
+        if out is None:
+            raise ValueError("Graph nicht zusammenhängend")
+        d, linv = out
+        diag = (linv ** 2 / d[:, None]).sum(axis=0)         # Diagonale von L^-T D^-1 L^-1
+        keep = [v for v in range(n) if v != u]
+        reff[u] = dict(zip(keep, diag))
+    return [float(w * reff[min(e[0], e[1])][max(e[0], e[1])]) for e, w in zip(edges, weights)]
 
 
 def edge_weights(costs, beta):

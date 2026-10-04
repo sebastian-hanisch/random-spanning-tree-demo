@@ -24,7 +24,7 @@ def _text():
 
 def test_count_and_cost_by_size():
     assert [round(_rc(n=n)["log10_tau"], 1) for n in C.N_SWEEP] == [6.2, 9.6, 15.7, 23.9, 31.2]
-    assert [round(_rc(n=n)["cost_ratio"], 2) for n in C.N_SWEEP] == [1.98, 2.05, 1.88, 1.82, 1.79]
+    assert [round(_rc(n=n)["cost_ratio"], 2) for n in C.N_SWEEP] == [1.98, 2.05, 1.88, 1.79, 1.80]
     assert [round(_rc(k=k)["log10_tau"], 1) for k in (3, 4, 6, 10, 1000)] == [8.0, 11.0, 15.7, 20.4, 25.1]
     assert [round(_rc(k=k)["cost_ratio"], 2) for k in (3, 6, 1000)] == [1.30, 1.88, 3.37]
 
@@ -40,9 +40,9 @@ def test_uniform_trees_ignore_costs():
 
 def test_temperature_lowers_the_cost_ratio_and_raises_p_mst():
     assert [round(_rc(b=b)["cost_ratio"], 2) for b in (2.0, 4.0, 8.0)] == [1.28, 1.10, 1.03]
-    assert _rc(b=4.0)["p_mst"] == pytest.approx(0.0003, abs=0.00005) and _rc(b=8.0)["p_mst"] == pytest.approx(0.027, abs=0.0005) and _rc(b=16.0)["p_mst"] == pytest.approx(0.248, abs=0.0005)
+    assert _rc(b=4.0)["p_mst"] == pytest.approx(0.0003, abs=0.00005) and _rc(b=8.0)["p_mst"] == pytest.approx(0.027, abs=0.0005) and _rc(b=16.0)["p_mst"] == pytest.approx(0.258, abs=0.0005)
     _t = _text()
-    for v in ("0.03 %", "2.7 %", "24.8 %"):
+    for v in ("0.03 %", "2.7 %", "25.8 %"):
         assert v in _t, v
 
 
@@ -129,7 +129,7 @@ def test_step_counts_by_size_and_temperature_in_the_readme():
     a = ev.analyse(ev.Settings(b=8.0, seed=100000))
     for kind in ("aldous",):
         assert all(ev.sampler_compare(ev.analyse(ev.Settings(b=8.0, seed=s)), 100)[kind]["n_samples"] < 100 for s in C.SWEEP_SEEDS)
-    assert _rc(b=16.0)["cost_ratio"] == pytest.approx(1.004, abs=0.0005) and a.tau > 0
+    assert _rc(b=16.0)["cost_ratio"] == pytest.approx(1.006, abs=0.0005) and a.tau > 0
 
 
 def test_k4_uniformity_and_wilson_mean_cost_in_the_readme():
