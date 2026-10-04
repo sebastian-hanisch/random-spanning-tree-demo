@@ -263,7 +263,7 @@ elif step == 3:
             st.plotly_chart(build_freq_scatter(a.incl, stt["freq"], a.mst), width="stretch", key="s3_scatter")
         st.caption("Links: Verteilung der Baumlängen; rechts: jede Kante als Punkt (Häufigkeit gegen exakte Wahrscheinlichkeit) - auf der Diagonalen würfelt das Verfahren richtig. Kruskal mit Zufallsordnung weicht systematisch ab.")
     u = ev.uniformity("textbook")
-    st.markdown(f"**Gleichverteilungstest** auf dem Lehrbuch-Graphen ({u['trees']} Spannbäume, alle aufgezählt, je 20 000 Würfe): Chi-Quadrat gegen den kritischen Wert {u['crit']:.1f} (99.9 %).")
+    st.markdown(f"**Gleichverteilungstest** auf dem Lehrbuch-Graphen ({u['trees']} Spannbäume, alle aufgezählt, je 20 000 Würfe): Chi-Quadrat gegen den kritischen Wert {u['crit']:.1f} (99.9 %; Näherung nach Wilson-Hilferty, der exakte Wert liegt etwa 0.1 niedriger).")
     st.plotly_chart(build_uniformity(u), width="stretch", key="s3_uniform")
     st.caption(f"Wilson ({u['wilson']['chi2']:.0f}) und Aldous-Broder ({u['aldous']['chi2']:.0f}) liegen unter dem kritischen Wert, Kruskal mit Zufallsordnung ({u['kruskal']['chi2']:.0f}) weit darüber; seine exakte Abweichung von der "
                f"Gleichverteilung (halber Betrag der Wahrscheinlichkeitsunterschiede) beträgt {u['kruskal_exact_tv'] * 100:.1f} %.")
