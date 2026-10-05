@@ -299,7 +299,7 @@ def test_failure_pattern_components():
 
 
 def test_statistics_helpers():
-    assert A.chi2_crit(15) == pytest.approx(37.70, abs=0.3) and A.chi2_crit(5) == pytest.approx(20.52, abs=0.4)
+    assert A.chi2_crit(15) == pytest.approx(37.697, abs=0.001) and A.chi2_crit(5) == pytest.approx(20.515, abs=0.001)
     assert A.ranks([10, 20, 20, 5]) == [2.0, 3.5, 3.5, 1.0]
     assert A.spearman([1, 2, 3, 4], [10, 20, 30, 40]) == pytest.approx(1.0) and A.spearman([1, 2, 3, 4], [4, 3, 2, 1]) == pytest.approx(-1.0)
     assert A.spearman([1, 1, 1], [1, 2, 3]) == 0.0

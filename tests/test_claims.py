@@ -65,12 +65,12 @@ def test_wilson_and_aldous_steps_explode_when_cold():
 
 def test_random_kruskal_is_not_uniform():
     u = ev.uniformity("textbook")
-    assert u["kruskal"]["chi2"] == pytest.approx(189.9, abs=0.05) and u["crit"] == pytest.approx(45.4, abs=0.05) and u["wilson"]["chi2"] == pytest.approx(15.1, abs=0.05) and u["aldous"]["chi2"] == pytest.approx(17.5, abs=0.05)
+    assert u["kruskal"]["chi2"] == pytest.approx(189.9, abs=0.05) and u["crit"] == pytest.approx(45.3, abs=0.05) and u["wilson"]["chi2"] == pytest.approx(15.1, abs=0.05) and u["aldous"]["chi2"] == pytest.approx(17.5, abs=0.05)
     assert u["kruskal_exact_tv"] == pytest.approx(0.041, abs=0.0005)
     r = _rc()
     assert r["kruskal_dev"] == pytest.approx(0.045, abs=0.0015) and r["wilson_dev"] == pytest.approx(0.024, abs=0.0015) and r["kruskal_dev"] > 1.5 * r["wilson_dev"]
     _t = _text()
-    for v in ("189.9", "45.4", "4.1 %", "(15.1)", "(17.5)", "0.045", "0.024"):
+    for v in ("189.9", "45.3", "4.1 %", "(15.1)", "(17.5)", "0.045", "0.024"):
         assert v in _t, v
 
 
@@ -134,6 +134,6 @@ def test_step_counts_by_size_and_temperature_in_the_readme():
 
 def test_k4_uniformity_and_wilson_mean_cost_in_the_readme():
     u = ev.uniformity("k4")
-    assert (round(u["wilson"]["chi2"], 1), round(u["aldous"]["chi2"], 1), round(u["kruskal"]["chi2"], 1), round(u["crit"], 1)) == (18.1, 13.5, 60.8, 37.8)
+    assert (round(u["wilson"]["chi2"], 1), round(u["aldous"]["chi2"], 1), round(u["kruskal"]["chi2"], 1), round(u["crit"], 1)) == (18.1, 13.5, 60.8, 37.7)
     a = ev.analyse(ev.Settings(kind="textbook", b=2.0))
     assert ev.sample_stats(a, "wilson", 20000)["mean_cost"] == pytest.approx(16.80, abs=0.02)

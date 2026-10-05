@@ -90,5 +90,14 @@ def test_tree_count_against_deletion_contraction(seed):
 
 def test_chi2_critical_value_against_scipy():
     stats = pytest.importorskip("scipy.stats")
-    for df in (10, 15, 20, 50, 100):                                     # Wilson-Hilferty: für kleine df (2, 4) um 2 bis 3 % zu hoch, ab 10 unter 1 %
-        assert A.chi2_crit(df) == pytest.approx(stats.chi2.ppf(0.999, df), rel=0.01)
+    for df in (1, 2, 4, 10, 15, 20, 50, 100, 500):
+        for p in (0.5, 0.9, 0.95, 0.99, 0.999):
+            assert A.chi2_crit(df, p) == pytest.approx(stats.chi2.ppf(p, df), abs=1e-9, rel=1e-12), (df, p)
+
+
+def test_chi2_critical_value_against_table_values():
+    # Tabellenwerte der Chi-Quadrat-Verteilung (hier gegen scipy gerechnet und mit gängigen Tafeln verglichen); unabhängig von scipy im Lauf
+    assert A.chi2_crit(1, 0.95) == pytest.approx(3.841458820694124, abs=1e-9)
+    assert A.chi2_crit(10, 0.95) == pytest.approx(18.307038053275146, abs=1e-9)
+    assert A.chi2_crit(2, 0.95) == pytest.approx(2 * math.log(20), abs=1e-9)        # df = 2: Exponentialverteilung, Quantil = -2 ln(1 - p)
+    assert round(A.chi2_crit(20), 1) == 45.3 and round(A.chi2_crit(15), 1) == 37.7

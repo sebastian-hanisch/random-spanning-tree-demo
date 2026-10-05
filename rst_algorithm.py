@@ -21,8 +21,6 @@ import numpy as np
 
 from rst_unionfind import UnionFind
 
-Z999 = 3.0902323061678132                     # Quantil der Standardnormalverteilung zu 0.999
-
 
 def make_rng(*parts):
     """Plattformstabiler Zufallsstrom (Mersenne-Twister, Seed aus dem Text der Teile)."""
@@ -359,10 +357,55 @@ def is_spanning_tree(n, edges, tree):
 # --- Statistik ------------------------------------------------------------------------------------------------------------------------------------
 
 
-def chi2_crit(df, z=Z999):
-    """Kritischer Wert der Chi-Quadrat-Verteilung (Näherung nach Wilson-Hilferty; Standard: 99.9-%-Quantil)."""
-    a = 2.0 / (9.0 * df)
-    return df * (1.0 - a + z * math.sqrt(a)) ** 3
+def _gamma_p(a, x):
+    """Regularisierte untere unvollständige Gammafunktion P(a, x): Reihe für x < a + 1, sonst Kettenbruch (Lentz) für Q = 1 - P."""
+    if x <= 0.0:
+        return 0.0
+    log_pref = a * math.log(x) - x - math.lgamma(a)
+    if x < a + 1.0:
+        term = total = 1.0 / a
+        n = a
+        for _ in range(10_000):
+            n += 1.0
+            term *= x / n
+            total += term
+            if abs(term) < abs(total) * 1e-16:
+                break
+        return total * math.exp(log_pref)
+    tiny = 1e-300
+    b = x + 1.0 - a
+    c = 1.0 / tiny
+    d = 1.0 / b
+    h = d
+    for i in range(1, 10_000):
+        an = -i * (i - a)
+        b += 2.0
+        d = an * d + b
+        d = tiny if abs(d) < tiny else d
+        c = b + an / c
+        c = tiny if abs(c) < tiny else c
+        d = 1.0 / d
+        delta = d * c
+        h *= delta
+        if abs(delta - 1.0) < 1e-16:
+            break
+    return 1.0 - math.exp(log_pref) * h
+
+
+def chi2_crit(df, p=0.999):
+    """Kritischer Wert der Chi-Quadrat-Verteilung, exakt (Quantil zum Niveau `p`, Standard 99.9 %): Bisektion auf der regularisierten unvollständigen Gammafunktion, ohne scipy."""
+    lo, hi = 0.0, max(1.0, float(df))
+    while _gamma_p(df / 2.0, hi / 2.0) < p:
+        lo, hi = hi, hi * 2.0
+    for _ in range(200):
+        mid = 0.5 * (lo + hi)
+        if _gamma_p(df / 2.0, mid / 2.0) < p:
+            lo = mid
+        else:
+            hi = mid
+        if hi - lo <= 1e-13 * hi:
+            break
+    return 0.5 * (lo + hi)
 
 
 def chi2_stat(counts, probs):

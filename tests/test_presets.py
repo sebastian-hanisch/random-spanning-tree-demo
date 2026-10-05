@@ -100,8 +100,8 @@ def test_help_cold():
 def test_help_kruskal():
     name = "Kruskal mit Zufallsordnung"
     u = ev.uniformity("textbook")
-    assert (u["wilson"]["chi2"], u["aldous"]["chi2"], u["kruskal"]["chi2"], u["crit"]) == pytest.approx((15.1, 17.5, 189.9, 45.4), abs=0.05) and u["kruskal_exact_tv"] == pytest.approx(0.041, abs=0.0005)
-    _has(name, "2000", "20 000", "15.1", "17.5", "45.4", "189.9", "4.1 %")
+    assert (u["wilson"]["chi2"], u["aldous"]["chi2"], u["kruskal"]["chi2"], u["crit"]) == pytest.approx((15.1, 17.5, 189.9, 45.3), abs=0.05) and u["kruskal_exact_tv"] == pytest.approx(0.041, abs=0.0005)
+    _has(name, "2000", "20 000", "15.1", "17.5", "45.3", "189.9", "4.1 %")
 
 
 def test_help_high_failure():
